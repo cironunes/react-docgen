@@ -52,6 +52,7 @@ export type Parser = {
 type ParserOptions = {
   plugins?: Array<string | [string, {}]>,
   tokens?: boolean,
+  root?: string,
 };
 
 type BabelOptions = {

@@ -10,7 +10,7 @@
 import types from 'ast-types';
 import { traverseShallow } from './traverse';
 import resolve from 'resolve';
-import { dirname } from 'path';
+import { dirname, resolve as pathResolve } from 'path';
 import buildParser, { type Options } from '../babelParser';
 import fs from 'fs';
 
@@ -25,18 +25,24 @@ export default function resolveImportedValue(
   // Also never traverse into react itself.
   const source = path.node.source.value;
   const options = getOptions(path);
-  if (!options || !options.filename || source === 'react') {
+
+  if (!options || !options.filename || !options.root || source === 'react') {
     return null;
   }
 
   // Resolve the imported module using the Node resolver
-  const basedir = dirname(options.filename);
   let resolvedSource;
+  // const _basedir = dirname(options.filename);
+  // eslint-disable-next-line no-console
+  // console.log(_basedir, 'not used');
+  const basedir = pathResolve(__dirname, options.root || '');
 
   try {
-    resolvedSource = resolve.sync(source, {
+    const _source = source.replace(/\.\.\//g, '');
+    const actualSource = _source.startsWith('./') ? _source : `./${_source}`;
+    resolvedSource = resolve.sync(actualSource, {
       basedir,
-      extensions: ['.js', '.jsx', '.ts', '.tsx'],
+      extensions: ['.js', '.jsx', '.ts', '.tsx', '.mjs'],
     });
   } catch (err) {
     return null;
@@ -54,7 +60,6 @@ export default function resolveImportedValue(
   const code = fs.readFileSync(resolvedSource, 'utf8');
   const parseOptions: Options = {
     ...options,
-    parserOptions: {},
     filename: resolvedSource,
   };
 
