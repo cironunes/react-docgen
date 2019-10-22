@@ -32,10 +32,10 @@ export default function resolveImportedValue(
 
   // Resolve the imported module using the Node resolver
   let resolvedSource;
-  // const _basedir = dirname(options.filename);
-  // eslint-disable-next-line no-console
-  // console.log(_basedir, 'not used');
-  const basedir = pathResolve(__dirname, options.root || '');
+  const basedir = pathResolve(
+    __dirname,
+    options.root || dirname(options.filename) || '',
+  );
 
   try {
     const _source = source.replace(/\.\.\//g, '');

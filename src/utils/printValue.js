@@ -21,9 +21,6 @@ function deindent(code: string): string {
 
 function getSrcFromAst(path: NodePath): string {
   do {
-    if (!path.node) {
-      // debugger;
-    }
     if (path.node.type === 'File') {
       return path.node.__src;
     }
